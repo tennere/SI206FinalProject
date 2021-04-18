@@ -72,10 +72,84 @@ def creating_top_100_artists_table(cur, conn):
     conn.commit()
 
 
+def find_average_weeks_on_chart(cur, conn):
+    weeks_on_chart_list = []
+
+    cur.execute("SELECT weeks_on_chart FROM Hot_100_Artists")
+    weeks_on_chart_data = cur.fetchall()
+    
+    for week_tuple in weeks_on_chart_data:
+        week = week_tuple[0]
+        weeks_on_chart_list.append(week)
+    
+    total = 0
+    for week in weeks_on_chart_list:
+        total += week
+    
+    average_weeks = total / len(weeks_on_chart_list)
+    
+    average_weeks_message = f"The average time each artist has spent on the 'Hot 100 Artists' chart is {average_weeks} weeks. "
+    
+    return average_weeks_message
+
+def find_max_weeks_on_chart(cur, conn):
+    weeks_on_chart_list = []
+
+    cur.execute("SELECT weeks_on_chart FROM Hot_100_Artists")
+    weeks_on_chart_data = cur.fetchall()
+    
+    for week_tuple in weeks_on_chart_data:
+        week = week_tuple[0]
+        weeks_on_chart_list.append(week)
+    
+    max_weeks = max(weeks_on_chart_list)
+
+    max_years = round(max_weeks / 52, 2)
+
+    max_time_message = f"The maximum time an artist has spent on the 'Hot 100 Artists' chart is {max_weeks} weeks, which is equal to approximately {max_years} years."
+
+    return max_time_message
+
+
+def data_collection_finished(cur, conn):
+    cur.execute('SELECT name FROM Hot_100_Artists')
+    artists = cur.fetchall()
+
+    if len(artists) == 100:
+        return True
+    else:
+        return False
+
+
+def create_txt_file(filename, cur, conn):
+    path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+    f = open(path + filename, "w")
+
+    avg_weeks_on_chart = find_average_weeks_on_chart(cur, conn)
+    max_weeks_on_chart = find_max_weeks_on_chart(cur, conn)
+
+    f.write("Statistics from the 'Billboard Hot 100 Artists' Table: \n\n")
+    f.write("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n\n")
+    
+    f.write(avg_weeks_on_chart + "\n\n")
+
+    f.write(max_weeks_on_chart + "\n\n")
+
+    f.close()
+
 
 def main():
     cur, conn = set_up_database("top_100_artists.db")
     creating_top_100_artists_table(cur, conn)
+    find_average_weeks_on_chart(cur, conn)
+    find_max_weeks_on_chart(cur, conn)
+
+    collection_finished = data_collection_finished(cur, conn)
+    
+    if collection_finished:
+        create_txt_file('top_100_artists_statistics.txt', cur, conn)
+    
+    conn.close()
 
 if __name__ == "__main__":
     main()
