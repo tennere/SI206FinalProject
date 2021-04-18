@@ -1,4 +1,5 @@
-from googleapiclient.discovery import build
+from pyyoutube import Api
+import pandas as pd
 import requests
 import re
 import os 
@@ -8,8 +9,7 @@ import json
 
 
 #api key 
-api_key = 'AIzaSyB_Fx4Daz_iTVGMNZEBp5Oc4mwOyYDeqGI'
-youtube = build('youtube', 'v3', developerKey = api_key)
+yt_key = Api(api_key="AIzaSyAa1ctT3bvVji_yvLIECttn8_4v7iV5aGU")
 
 #takes in database name, returns cur and conn
 
@@ -32,30 +32,32 @@ def getChannels(cur, conn):
     cur.execute(f'SELECT name FROM Hot_100_Artists')
     for names in cur.fetchall():
         artists_tup.append(names)
+
     
     #change tuple to list
     artists_list = [item for t in artists_tup for item in t]
-    #print(artists_list)
+    print(artists_list)
 
     #for each artist, fetch info
-    for i in artists_list:
-        request = youtube.search().list(q = i, part = 'snippet', maxResults = 1, type = 'channel')
-        response_names = request.execute()
-        #print(response_names)
-    #return response_names
+    #for i in artists_list:
+    request = yt_key.search_by_keywords(q= artists_list[0], search_type='channel', limit = 1)['channel_id']
 
+    print(request)
+    
+'''
     #makes a list of each artist's channel_id
     channel_ids = []
-    for i in response_names:
+    for i in request:
         channel = i['items'][0]['channelId']
         channel_ids.append(channel)
+    
     #print(channel_ids)
     return channel_ids
     
-
+'''
 def getNumSubscribers(channel_ids):
-    ''' Takes in channel ids, cursor, and connection; Returns list subscriber counts
-    '''
+     #Takes in channel ids, cursor, and connection; Returns list subscriber counts
+    
     #get statistics for each channel
     for i in channel_ids:
         request = youtube.channel().list(part = 'statistics', maxResults = 1, channelId = i)
