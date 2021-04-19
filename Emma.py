@@ -19,33 +19,31 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
 
-# def setUpDatabase(db_name):
-#     path = os.path.dirname(os.path.abspath(__file__))
-#     conn = sqlite3.connect('top_100_artists.db')
-#     cur = conn.cursor()
-#     return cur, conn
+def setUpDatabase(db_name):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect('top_100_songs.db')
+    cur = conn.cursor()
+    return cur, conn
 
 
-# def getTitleList(cur, conn):
-#     '''Takes in cursor and connection; Returns list of titles of tracks
-#     '''
-#     #List of tuples of artists, but we want ot change this to songs hopefully
-#     title_tup = []
-#     cur.execute(f'SELECT name FROM Hot_100_Artists')
-#     for titles in cur.fetchall():
-#         title_tup.append(titles)
+def getTitleList(cur, conn):
+    '''Takes in cursor and connection; Returns list of titles of tracks
+    '''
+    #List of tuples of songs
+    title_tup = []
+    cur.execute(f'SELECT song_name FROM Hot_100_Songs')
+    for titles in cur.fetchall():
+        title_tup.append(titles)
     
-#     #change tuple to list
-#     titles_list = [item for t in title_tup for item in t]
-#     #print(titles_list)
-#     return titles_list
-
+    #change tuple to list
+    titles_list = [item for t in title_tup for item in t]
+    #print(titles_list)
+    return titles_list
 
 
 def getTitleIDs(titles_list):
     '''Takes in cursor and connection and list of titles of tracks; Returns a list of IDS of each track
     '''
-    
     #this is from an exmaple online (https://github.com/plamere/spotipy/blob/master/examples/search.py)
     title_ids = []
     for title in titles_list:
@@ -95,7 +93,7 @@ def getTrackFeatures(title_ids):
         track_features = [name, album, artist, length, popularity, danceability, energy, liveness, loudness, tempo]
         tracks_features_list.append(track_features)
     
-    print(tracks_features_list)
+    print(len(tracks_features_list))
     return tracks_features_list
 
 
@@ -120,8 +118,8 @@ def create_spotify_table(cur, conn, tracks_features_list):
 #then after the table is created, I can use select statements to find the average anything
 
 #For Visualizations: 
-    #length vs popularity
-    #popularity vs weeks on chart
+    #length vs popularity 
+    #popularity vs weeks on chart (USE JOIN?)
     #energy vs popularity
 
 
@@ -133,12 +131,58 @@ def join_tables(cur, conn):
 def average_popularity(cur,conn):
     #takes in cursor and connection as inputs. 
     # Returns a number, which is the average popularity of songs on top 100 list
-    pass
+    popularities = []
+    cur.execute("SELECT popularity FROM Spotify")
+    data = cur.fetchall()
+    
+    total_pops = 0
+    for i in data:
+        pop = i[0]
+        popularities.append(pop)
+        total_pops += pop
+
+    ave_pop = total_pops / len(popularities)
+    ave_pop_message = f"The average popularity of songs in the 'Hot 100 songs' chart is {ave_pop}."
+    
+    return ave_pop_message
+
 
 def average_length(cur,conn):
     #takes in cursor and connection as inputs. 
     # Returns a number, which is the average length of songs on top 100 list
-    pass
+    lengths = []
+    cur.execute("SELECT length FROM Spotify")
+    data = cur.fetchall()
+    
+    total_length = 0
+    for i in data:
+        length = i[0]
+        lengths.append(length)
+        total_length += length
+
+    ave_length = total_length / len(lengths)
+    ave_length_message = f"The average length of songs in the 'Hot 100 songs' chart is {ave_length}."
+    
+    return ave_length_message
+
+
+def average_energy(cur, conn):
+    #takes in cur, conn. Returns a number, which is the average energy of the top 100 songs
+    energies = []
+    cur.execute("SELECT energy FROM Spotify")
+    data = cur.fetchall()
+    
+    total_energy = 0
+    for i in data:
+        energy = i[0]
+        energies.append(length)
+        total_energy += energy
+
+    ave_energy = total_energy / len(energies)
+    ave_energy_message = f"The average energy of songs in the 'Hot 100 songs' chart is {ave_energy}."
+    
+    return ave_length_message
+
 
 def write_data_to_file(filename, cur, conn):
     #Takes in a filename (string) as an input and the database cursor/connection. 
@@ -149,17 +193,18 @@ def write_data_to_file(filename, cur, conn):
 
 def main():
     #Takes in nothing and returns nothing. Calls the functions.
+    cur, conn = setUpDatabase('top_100_songs.db')
+    t_list = getTitleList(cur, conn)
     
- 
-    t_list = ['Levitating', 'Leave The Door Open']
-    getTitleIDs(t_list)
+    #t_list = ['Levitating', 'Leave The Door Open']
+    #getTitleIDs(t_list)
     #getTrackFeatures(["463CkQjx2Zk1yXoBuierM9"])
                     
-    getTrackFeatures(getTitleIDs(t_list))
+    x = getTrackFeatures(getTitleIDs(t_list))
     #getTrackFeatures(["1dI77VhaLcQSgQLSnIs03D"])
                         #^^ that is the correct ID to get!!! You need to figure out how to get that specific one
-    cur, conn = setUpDatabase('top_100_artists.db')
-    create_spotify_table(cur, conn, getTrackFeatures(getTitleIDs(t_list)))
+    
+    create_spotify_table(cur, conn, x)
 
 
 if __name__ == "__main__":
