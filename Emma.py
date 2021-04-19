@@ -42,9 +42,8 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
 
-
 def getTitleIDs(titles_list):
-    '''Takes in cursor and connection and list of titles of tracks; Returns IDS of each track
+    '''Takes in cursor and connection and list of titles of tracks; Returns a list of IDS of each track
     '''
     
     #this is from an exmaple online (https://github.com/plamere/spotipy/blob/master/examples/search.py)
@@ -54,16 +53,16 @@ def getTitleIDs(titles_list):
             search_str = sys.argv[1]
         else:
             search_str = title
-        info = sp.search(search_str)
-        t_id = info['tracks']
-        t_id = t_id['items'][0]#['album']['artists'][0]['id']
-        title_ids.append(t_id)
-        #use Beauitufl Soup to access the actual id?
-        #track_id = info[]
-        #title_ids.append(track_id)
-    pprint.pprint(t_id)
-   #print(title_ids)
+        info = sp.search(search_str, limit = 1) #the default already assings offset = 0 and type = 'track'
+        t_id = info['tracks']['items']
+        for x in t_id:
+            #print(x)
+            title_ids.append(x['id'])
+
+    #print(info)
+    #print(t_id)
     #print(title_ids)
+    #pprint.pprint(t_id)
     return title_ids
 
 
@@ -76,6 +75,7 @@ def getTrackFeatures(title_ids):
     #list of lists
     tracks_features_list = []
     for item in title_ids:
+        #print(item)
         info = sp.track(item)
         features = sp.audio_features(item)
         #info
@@ -95,69 +95,72 @@ def getTrackFeatures(title_ids):
         track_features = [name, album, artist, length, popularity, danceability, energy, liveness, loudness, tempo]
         tracks_features_list.append(track_features)
     
-    #print(tracks_features_list)
-  # return tracks_features_list
+    print(tracks_features_list)
+    return tracks_features_list
 
 
 def create_spotify_table(cur, conn, tracks_features_list):
     #create Spotify table with this list of lists (tracks_features_list)
     #can add all of those feautres if we want to
-    cur.execute("CREATE TABLE IF NOT EXISTS Spotify (track_id INTEGER PRIMARY KEY, name TEXT, artist INTEGER, length INTEGER, popularity INTEGER, energy INTEGER, loudness INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Spotify (track_id INTEGER PRIMARY KEY, name TEXT, artist TEXT, length INTEGER, popularity INTEGER, energy REAL, loudness REAL)")
+    #CHANGE track_id = 0 ... that's incorrect!!
     track_id = 0
     for track in tracks_features_list:
         track_id += 1 
         name = track[0]
-        artist = track[1]
-        length = track[2]
-        popularity = track[3]
-        energy = track[4]
-        loudness = track[5]
+        artist = track[2]
+        length = track[3]
+        popularity = track[4]
+        energy = track[6]
+        loudness = track[8]
         cur.execute("INSERT OR IGNORE INTO Spotify (track_id, name, artist, length, popularity, energy, loudness) VALUES (?, ?, ?, ?, ?, ?, ?)", (track_id, name, artist, length, popularity, energy, loudness))
     conn.commit()
 
 
 #then after the table is created, I can use select statements to find the average anything
 
-
-
-
-
+#For Visualizations: 
+    #length vs popularity
+    #popularity vs weeks on chart
+    #energy vs popularity
 
 
 def join_tables(cur, conn):
     #This function ???
     pass
 
-def get_artists_list():
-    #This function returns an artist list???
+
+def average_popularity(cur,conn):
+    #takes in cursor and connection as inputs. 
+    # Returns a number, which is the average popularity of songs on top 100 list
     pass
 
-#def create_spotify_table(cur, conn):
-    #Takes in the database cursor and connection as inputs and returns nothing. 
-    # Creates a table called Spotify_Table and finds the Spotify popularity 
-    # of each artist (is that possible? it's possible for each song) and inserts it into the table
-    #pass
-
-def average_weeks(cur,conn):
-    #This function will take the database cursor and connection as inputs. 
-    # Returns an integer, which is the average number of weeks on the Top 100 list 
-    # of current Billboard Top 100 Artists on Spotify.
+def average_length(cur,conn):
+    #takes in cursor and connection as inputs. 
+    # Returns a number, which is the average length of songs on top 100 list
     pass
 
 def write_data_to_file(filename, cur, conn):
     #Takes in a filename (string) as an input and the database cursor/connection. 
     # Returns nothing. Creates a file and writes return value of the 
-    # function average_weeks() to the file.
+    # function average_popularity() and average_length to the file.
     pass
 
 
 def main():
     #Takes in nothing and returns nothing. Calls the functions.
     
-    #cur, conn = setUpDatabase('top_100_artists.db')
-    t_list = ['Levitating']
+ 
+    t_list = ['Levitating', 'Leave The Door Open']
     getTitleIDs(t_list)
+    #getTrackFeatures(["463CkQjx2Zk1yXoBuierM9"])
+                    
+    getTrackFeatures(getTitleIDs(t_list))
     #getTrackFeatures(["1dI77VhaLcQSgQLSnIs03D"])
                         #^^ that is the correct ID to get!!! You need to figure out how to get that specific one
+    cur, conn = setUpDatabase('top_100_artists.db')
+    create_spotify_table(cur, conn, getTrackFeatures(getTitleIDs(t_list)))
+
+
 if __name__ == "__main__":
     main()
