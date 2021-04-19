@@ -48,6 +48,7 @@ def get_artist_information():
         tup = (song_name_list[i], song_artist_list[i], peak_list[i], weeks_on_chart_list[i])
         info_list.append(tup)
     
+    #print(info_list)
     return info_list 
     
 
@@ -59,18 +60,21 @@ def set_up_database(database_name):
 
 
 def creating_top_100_artists_table(cur, conn):
-    # CAN ONLY UPLOAD 25 AT A TIME
     cur.execute("CREATE TABLE IF NOT EXISTS Hot_100_Songs (rank INTEGER PRIMARY KEY, song_name TEXT, artist TEXT,  peak_on_chart INTEGER, weeks_on_chart INTEGER)")
     data = get_artist_information()
-    rank = 0
-    for song in data:
-        rank += 1 
-        name = song[0]
-        artist = song[1]
-        peak_on_chart = song[2]
-        weeks_on_chart = song[3]
-        cur.execute("INSERT OR IGNORE INTO Hot_100_Songs (rank, song_name, artist, peak_on_chart, weeks_on_chart) VALUES (?, ?, ?, ?, ?)", (rank, name, artist, peak_on_chart, weeks_on_chart))
-    conn.commit()
+    cur.execute('SELECT * FROM Hot_100_Songs')
+    ranks = cur.fetchall()
+    current = len(ranks) 
+    try:
+        for i in range(0, 25):
+            name = data[current + i][0]
+            artist = data[current + i][1]
+            peak_on_chart = data[current + i][2]
+            weeks_on_chart = data[current + i][3]
+            cur.execute("INSERT OR IGNORE INTO Hot_100_Songs (rank, song_name, artist, peak_on_chart, weeks_on_chart) VALUES (?, ?, ?, ?, ?)", (current + i + 1, name, artist, peak_on_chart, weeks_on_chart))
+        conn.commit()
+    except:
+        print("ERROR: Ran too many times!")
 
 '''
 def find_average_weeks_on_chart(cur, conn):
