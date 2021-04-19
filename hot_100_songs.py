@@ -20,25 +20,21 @@ def get_artist_information():
     song_find = soup.find_all("span", class_ = 'chart-element__information__song text--truncate color--primary')
     for song in song_find:
         song_text = song.get_text()
-        #print(song_text)
         song_name_list.append(song_text)
 
     artist_find = soup.find_all("span", class_ = 'chart-element__information__artist text--truncate color--secondary')
     for artist in artist_find:
         artist_text = artist.get_text()
-        #print(artist_text)
         song_artist_list.append(artist_text)
     
     peak_find = soup.find_all("span", class_ = 'chart-element__meta text--center color--secondary text--peak')
     for peak in peak_find:
         peak_text = int(peak.get_text())
-        #print(peak_text)
         peak_list.append(peak_text)
     
     weeks_find = soup.find_all("span", class_ = "chart-element__meta text--center color--secondary text--week")
     for week in weeks_find:
         weeks_text = int(week.get_text())
-        #print(weeks_text)
         weeks_on_chart_list.append(weeks_text)
 
     
@@ -76,11 +72,11 @@ def creating_top_100_artists_table(cur, conn):
     except:
         print("ERROR: Ran too many times!")
 
-'''
+
 def find_average_weeks_on_chart(cur, conn):
     weeks_on_chart_list = []
 
-    cur.execute("SELECT weeks_on_chart FROM Hot_100_Artists")
+    cur.execute("SELECT weeks_on_chart FROM Hot_100_Songs")
     weeks_on_chart_data = cur.fetchall()
     
     for week_tuple in weeks_on_chart_data:
@@ -93,14 +89,14 @@ def find_average_weeks_on_chart(cur, conn):
     
     average_weeks = total / len(weeks_on_chart_list)
     
-    average_weeks_message = f"The average time each artist has spent on the 'Hot 100 Artists' chart is {average_weeks} weeks. "
+    average_weeks_message = f"The average time each song has spent on the 'Hot 100 Songs' chart is {average_weeks} weeks. "
     
     return average_weeks_message
 
 def find_max_weeks_on_chart(cur, conn):
     weeks_on_chart_list = []
 
-    cur.execute("SELECT weeks_on_chart FROM Hot_100_Artists")
+    cur.execute("SELECT weeks_on_chart FROM Hot_100_Songs")
     weeks_on_chart_data = cur.fetchall()
     
     for week_tuple in weeks_on_chart_data:
@@ -111,13 +107,13 @@ def find_max_weeks_on_chart(cur, conn):
 
     max_years = round(max_weeks / 52, 2)
 
-    max_time_message = f"The maximum time an artist has spent on the 'Hot 100 Artists' chart is {max_weeks} weeks, which is equal to approximately {max_years} years."
+    max_time_message = f"The maximum time song has spent on the 'Hot 100 Songs' chart is {max_weeks} weeks, which is equal to approximately {max_years} years."
 
     return max_time_message
 
 
 def data_collection_finished(cur, conn):
-    cur.execute('SELECT name FROM Hot_100_Artists')
+    cur.execute('SELECT song_name FROM Hot_100_Songs')
     artists = cur.fetchall()
 
     if len(artists) == 100:
@@ -133,7 +129,7 @@ def create_txt_file(filename, cur, conn):
     avg_weeks_on_chart = find_average_weeks_on_chart(cur, conn)
     max_weeks_on_chart = find_max_weeks_on_chart(cur, conn)
 
-    f.write("Statistics from the 'Billboard Hot 100 Artists' Table: \n\n")
+    f.write("Statistics from the 'Billboard Hot 100 Songs' Table: \n\n")
     f.write("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n\n")
     
     f.write(avg_weeks_on_chart + "\n\n")
@@ -142,21 +138,19 @@ def create_txt_file(filename, cur, conn):
 
     f.close()
 
-'''
+
 def main():
     
     cur, conn = set_up_database("top_100_songs.db")
     creating_top_100_artists_table(cur, conn)
-    '''
-    find_average_weeks_on_chart(cur, conn)
-    find_max_weeks_on_chart(cur, conn)
+    
 
     collection_finished = data_collection_finished(cur, conn)
     
     if collection_finished:
-        create_txt_file('top_100_artists_statistics.txt', cur, conn)
+        create_txt_file('top_100_songs_statistics.txt', cur, conn)
     
-    '''
+    
     conn.close()
     
 
