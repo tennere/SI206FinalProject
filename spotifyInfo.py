@@ -156,7 +156,12 @@ def create_spotify_table(cur, conn, tracks_features_list):
  
 def joinTables(cur, conn):
    #This function ???
- 
+   
+   cur.execute('SELECT weeks_on_chart FROM Hot_100_Songs JOIN Spotify ON Spotify.track_id = Hot_100_Songs.rank')
+   weeks_on_chart = cur.fetchall()
+   print(weeks_on_chart)
+   #now we want to make the visualizations
+
    #Ashley's example:
        #cur.execute('SELECT temperature FROM WeatherData JOIN Temperatures ON Temperatures.id = WeatherData.average_temperature_id')
        #this returns a list of everything she wanted. temperaturesc = cur.fetchall()
