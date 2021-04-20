@@ -161,16 +161,11 @@ def joinTables(cur, conn):
    weeks_on_chart = cur.fetchall()
    print(weeks_on_chart)
    #now we want to make the visualizations
-
    #Ashley's example:
        #cur.execute('SELECT temperature FROM WeatherData JOIN Temperatures ON Temperatures.id = WeatherData.average_temperature_id')
        #this returns a list of everything she wanted. temperaturesc = cur.fetchall()
- 
 
     #!! Join with julia's 'rank' and my 'track_id' and select the week on charts!
-
-   #temperatures = cur.fetchall()
-   #use JOIN if i want to g
    pass
  
  
@@ -208,7 +203,7 @@ def average_length(cur,conn):
        total_length += length
  
    ave_length = total_length / len(lengths)
-   ave_length_message = f"The average length of songs in the 'Hot 100 songs' chart is {ave_length}."
+   ave_length_message = f"The average length of songs in the 'Hot 100 songs' chart is {ave_length} (ms)."
   
    return ave_length_message
  
@@ -236,42 +231,59 @@ def max_popularity(cur, conn):
  
    cur.execute("SELECT popularity FROM Spotify")
    data = cur.fetchall()
- 
-   max_pop = data[0]
-   for i in data:
-       if data[i] > max_pop:
-           max_pop = data[i]
-       else:
-           max_pop = max_pop
+   max_pop = data[0][0]
+   for i in range(len(data)):
+      if data[i][0] > max_pop:
+         max_pop = data[i][0]
+      else:
+         max_pop = max_pop
   
-   return max_pop
+   max_pop_message = f"The highest Spotify popularity of the top songs in the 'Hot 100 songs' chart is {max_pop}."
+   #print(max_pop_message)
+   return max_pop_message
  
  
 def write_data_to_file(filename, cur, conn):
    #Takes in a filename (string) as an input and the database cursor/connection.
    # Returns nothing. Creates a file and writes return value of the
-   # function average_popularity() and average_length to the file.
-   pass
+   # function average_popularity(), average_length(), average_energy(), and max_popularity() to the file.
+
+   avg_pop = average_popularity(cur, conn)
+   avg_len = average_length(cur, conn)
+   avg_en = average_energy(cur, conn)
+   max_pop = max_popularity(cur, conn)
+
+   with open('spotifyStatistics.txt', 'w') as f:
+      f.write('some text')
+      f.write("Statistics from the 'Spotify' Table: \n\n")
+      f.write("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n\n")
+      f.write(avg_pop + "\n\n")
+      f.write(avg_len + "\n\n")
+      f.write(avg_en + "\n\n")
+      f.write(max_pop + "\n\n")
+
+   #path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+   #f = open(path + filename, "w")
+
+   #pass
  
  
 def main():
    #Takes in nothing and returns nothing. Calls the functions.
    cur, conn = setUpDatabase('top_100_songs.db')
-   t_list = getTitleList(cur, conn)
+   t_list = getTitleList(cur, conn)       
+   x = getTrackFeatures(getTitleIDs(t_list))
   
+   create_spotify_table(cur, conn, x)
+   max_popularity(cur, conn)
+   write_data_to_file('spotifyStatistics.txt', cur, conn)
+
    #t_list = ['Levitating', 'Leave The Door Open']
    #getTitleIDs(t_list)
    #getTrackFeatures(["463CkQjx2Zk1yXoBuierM9"])
-                  
-   x = getTrackFeatures(getTitleIDs(t_list))
    #getTrackFeatures(["1dI77VhaLcQSgQLSnIs03D"])
                        #^^ that is the correct ID to get!!! You need to figure out how to get that specific one
-  
-   create_spotify_table(cur, conn, x)
- 
-   average_popularity(cur, conn)
- 
- 
+
 if __name__ == "__main__":
    main()
 
