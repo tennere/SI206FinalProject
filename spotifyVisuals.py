@@ -1,4 +1,3 @@
-
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
@@ -29,7 +28,7 @@ def main():
     
     #creates a scatter plot of each songs popularity vs weeks on chart to see if correlation
     fig1 = go.Figure()
-    fig1.add_track(go.Scatter(
+    fig1.add_trace(go.Scatter(
         x = popularity_list,
         y = weeks_on_chart_list,
         marker = dict(color = 'rgb(200,255,255)', size = 10),
@@ -39,6 +38,19 @@ def main():
     fig1.update_layout(title = "Spotify Popularity of Top 100 Songs vs. # Weeks on Billboard 100 Chart",
                         xaxis_title="Spotify Popularity", yaxis_title="# Weeks on Chart", xaxis=dict(range=[0, 250]))
     fig1.show()
+
+
+    #Ewelina's:
+    #Creates a scatterplot of comparing popularity of a song on Spotify versus its ranking on the Billboard Hot 100.
+    fig = go.Figure(data=go.Scatter(x = popularity_list,
+                                y = weeks_on_chart_list,
+                                mode = 'markers',
+                                marker_color = "rgb(153, 0, 153)"))
+    fig.update_traces(mode='markers', marker_line_width=2, marker_size=15)
+    fig.update_layout(title='Spotify Popularity of Top 100 Songs vs. # Weeks on Billboard 100 Chart', xaxis_title="Popularity on Spotify", yaxis_title="# Weeks on Chart")
+    fig.show()
+
+
 
 
     if __name__ == "__main__":
