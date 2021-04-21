@@ -183,6 +183,7 @@ def average_popularity(cur,conn):
        total_pops += pop
  
    ave_pop = total_pops / len(popularities)
+   ave_pop = round(ave_pop, 2)
    ave_pop_message = f"The average popularity of songs in the 'Hot 100 songs' chart is {ave_pop}."
   
    #print(ave_pop_message)
@@ -203,6 +204,7 @@ def average_length(cur,conn):
        total_length += length
  
    ave_length = total_length / len(lengths)
+   ave_length = round(ave_length, 2)
    ave_length_message = f"The average length of songs in the 'Hot 100 songs' chart is {ave_length} (ms)."
   
    return ave_length_message
@@ -221,6 +223,7 @@ def average_energy(cur, conn):
        total_energy += energy
  
    ave_energy = total_energy / len(energies)
+   ave_energy = round(ave_energy,2)
    ave_energy_message = f"The average energy of songs in the 'Hot 100 songs' chart is {ave_energy}."
   
    return ave_energy_message
@@ -254,7 +257,6 @@ def write_data_to_file(filename, cur, conn):
    max_pop = max_popularity(cur, conn)
 
    with open('spotifyStatistics.txt', 'w') as f:
-      f.write('some text')
       f.write("Statistics from the 'Spotify' Table: \n\n")
       f.write("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n\n")
       f.write(avg_pop + "\n\n")
