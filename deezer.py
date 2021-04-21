@@ -12,16 +12,20 @@ import json
 base = 'https://api.deezer.com/'
 
 def setUpDatabase(db_name):
-    '''takes in the database, returns cursor and connection
-    '''
+# sets up the database. takes in the database name, returns 
+# cursor and connection.
+    
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect('top_100_songs.db')
     cur = conn.cursor()
     return cur, conn
 
+
 def getInfo(cur, conn):
-    '''Takes in cursor and connection. Returns tuple with all of deezer data
-    '''
+# Selects the song name and artist from the Hot 100 Songs table and
+# uses this information to get data for each song from the Deezer API.
+# Takes in cursor and connection. Returns tuple with all of Deezer data.
+    
     #select song names and artists from Hot 100 songs table and create a tuple called SongArt
     cur.execute(f'SELECT song_name, artist FROM Hot_100_Songs')
     songArt = cur.fetchall()
@@ -90,13 +94,14 @@ def getInfo(cur, conn):
     return DeezData
         
 def makeDeezerTable(cur):
-    '''Creates a table to hold all of the deezer information
-    '''
+# Creates a table to hold all of the Deezer data. Takes in cur. Returns nothing. 
+
     cur.execute(f'CREATE TABLE IF NOT EXISTS Deezer (track_id INTEGER PRIMARY KEY, song_name TEXT, artist_name TEXT, songs_deezer_rank INTEGER, artist_fan_number INTEGER)')
 
 def getReq(base):
-    '''Takes in the api request and returns in dictionary format
-    '''
+# Takes in the API request. Returns the data in dictionary format
+# if the status code is 200. Returns nothing if else.  
+    
     #request works if status code is 200
     r = requests.get(base)
     if r.status_code == 200:
@@ -106,8 +111,10 @@ def getReq(base):
 
 
 def fillTable(cur, conn):
-    '''Takes in curson and connection and fills up the deezer table with the information fetched
-    '''
+# Takes in cur and connection. Fills up the Deezer table 
+# with the fetched information. Prints a "done" statement when collection is finished. 
+    
+
     #call the getInfo function
     data = getInfo(cur, conn)
 
@@ -128,8 +135,9 @@ def fillTable(cur, conn):
     print('done filling table')
 
 def avgFans(cur,conn):
-    '''Takes in cursor and connection, and calculates the average deezer fan number for artists of Billboard's top 100 songs
-    '''
+# Takes in cursor and connection. Calculates the average Deezer fan number for
+# artists of Billboard's top 100 songs. Returns the calculation in a string statement. 
+    
     #select fan numbers from deezer table
     cur.execute("SELECT artist_fan_number FROM Deezer")
     data = cur.fetchall()
@@ -153,8 +161,9 @@ def avgFans(cur,conn):
     return fanStatement
        
 def avgRank(cur, conn):
-    '''Takes in cursor and connection, and calculates the average deezer fan number for Billboard's top 100 songs
-    '''
+# Takes in cursor and connection. Calculates the average Deezer fan number for Billboard's 
+# top 100 songs. Returns the statistic in a string statement. 
+
     #select song rank from deezer table
     cur.execute("SELECT songs_deezer_rank FROM Deezer")
     data = cur.fetchall()
@@ -178,10 +187,9 @@ def avgRank(cur, conn):
     return rankStatement
 
 def writeToFile(filename, cur, conn):
-    ''' Takes in the filename, cursor and connection. 
-        Creates a file and writes the values of avgRank() and avgFans() into a txt file
-        Returns nothing
-    '''
+# Takes in the filename, cursor and connection. Creates a file and writes the statements 
+# from avgRank() and avgFans() into a .txt file. Returns nothing.
+    
     path = os.path.dirname(os.path.abspath(__file__)) + os.sep
     
     #open file for writing
