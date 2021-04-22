@@ -107,46 +107,32 @@ def getTrackFeatures(title_ids):
 def create_spotify_table(cur, conn, tracks_features_list):
    #Takes in cursor, connection, and list of lists of songs' features; Creates a Spotify table; Returns nothing
    #The table includes the track_id, the song's name, the artist, the length (MS), the Spotify popularity, the energy, and the loudness
- 
+   #Puts 25 songs and their features in the database at a time. After 100 songs, function returns an error statement
    
    cur.execute("CREATE TABLE IF NOT EXISTS Spotify (track_id INTEGER PRIMARY KEY, name TEXT, artist TEXT, length INTEGER, popularity INTEGER, energy REAL, loudness REAL)")
-   track_id = 0
-   for track in tracks_features_list:
+   data = tracks_features_list
+   cur.execute("SELECT * FROM Spotify")
+   #track_id from table is used as the counter
+   track_id = cur.fetchall()
+   current = len(track_id)
+
+   # try statement runs if it's the first four times the function is run
+   try:
+      #inserts 25 songs and their features at a time
+      for i in range(0, 25):
       #goes through the passed in list and retreives the specific features we want to add to the table for each song
-       track_id += 1
-       name = track[0]
-       artist = track[2]
-       length = track[3]
-       popularity = track[4]
-       energy = track[6]
-       loudness = track[8]
-       cur.execute("INSERT OR IGNORE INTO Spotify (track_id, name, artist, length, popularity, energy, loudness) VALUES (?, ?, ?, ?, ?, ?, ?)", (track_id, name, artist, length, popularity, energy, loudness))
-   conn.commit()
- 
- #THIS WAS TRYING TO DO THE LIMIT 25, BUT DON'T NEED IT ANYMORE?:
- 
-   # cur.execute("CREATE TABLE IF NOT EXISTS Spotify (track_id INTEGER PRIMARY KEY, name TEXT, artist TEXT, length INTEGER, popularity INTEGER, energy REAL, loudness REAL)")
-   # #!!CHANGE track_id = 0 ... that's incorrect!!
-   # track_id = 0
-  
-   # #to limit 25: grab length of table (how many rows we have so far ... starting at 0), then loop thru a range of 25 but start getting values at length spot ...
-   # cur.execute('SELECT * FROM Spotify')
-   # #this gets length of list
-   # length = len(cur.fetchall())
-   # #then start at row = length
-   # for num in range(25):
-   #     length = num
-   #     track = tracks_features_list[length] 
-   #     track_id += 1
-   #     name = track[0]
-   #     artist = track[2]
-   #     length = track[3]
-   #     popularity = track[4]
-   #     energy = track[6]
-   #     loudness = track[8]
-   #     cur.execute("INSERT OR IGNORE INTO Spotify (track_id, name, artist, length, popularity, energy, loudness) VALUES (?, ?, ?, ?, ?, ?, ?)", (track_id, name, artist, length, popularity, energy, loudness))
-   #     length += 1
-   # conn.commit()
+         name = data[current + i][0]
+         artist = data[current + i][2]
+         length = data[current + i][3]
+         popularity = data[current + i][4]
+         energy = data[current + i][6]
+         loudness = data[current + i][8]
+         cur.execute("INSERT OR IGNORE INTO Spotify (track_id, name, artist, length, popularity, energy, loudness) VALUES (?, ?, ?, ?, ?, ?, ?)", (current + i + 1, name, artist, length, popularity, energy, loudness))
+         conn.commit()
+   
+   #after running function 4 times, this error statement prints
+   except:
+        print("ERROR: Ran too many times!")
 
  
 def average_popularity(cur,conn):
