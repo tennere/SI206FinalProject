@@ -45,6 +45,32 @@ def main():
     
 
 
+    cur.execute('SELECT Hot_100_Songs.weeks_on_chart, Spotify.popularity FROM Hot_100_Songs JOIN Spotify ON Hot_100_Songs.rank = Spotify.track_id')
+    results = cur.fetchall()
+
+    popularity_list = []
+    weeks_on_chart_list = []
+
+    for r in results: 
+        #appends the first element of each result to the weeks_on_chart list & appends the second element of each result to the popularity_list
+        popularity_list.append(r[1])
+        weeks_on_chart_list.append(r[0])
+    
+    #creates a scatter plot of each songs Spotify popularity vs weeks on Hot 100 chart to see if correlation
+    fig1 = go.Figure()
+    fig1.add_trace(go.Scatter(
+        x = popularity_list,
+        y = weeks_on_chart_list,
+        marker = dict(color = 'green', size = 10),
+        mode = 'markers',
+        name = 'Spotify Popularity vs # Weeks on Billboard Hot 100 Chart',
+    ))
+    fig1.update_layout(title = "Spotify Popularity of Top 100 Songs vs. # Weeks on Billboard 100 Chart",
+                        xaxis_title="Spotify Popularity", yaxis_title="# Weeks on Chart", xaxis=dict(range=[0, 250]))
+    fig1.show()
+
+
+
 if __name__ == "__main__":
     main()
 
