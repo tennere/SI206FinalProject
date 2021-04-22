@@ -92,11 +92,6 @@ def getInfo(cur, conn):
     DeezData = [(songs[i], artists[i], deezer_ranks[i], fan_numbers[i]) for i in range(0, len(songs))]
     
     return DeezData
-        
-def makeDeezerTable(cur):
-# Creates a table to hold all of the Deezer data. Takes in cur. Returns nothing. 
-
-    cur.execute(f'CREATE TABLE IF NOT EXISTS Deezer (track_id INTEGER PRIMARY KEY, song_name TEXT, artist_name TEXT, songs_deezer_rank INTEGER, artist_fan_number INTEGER)')
 
 def getReq(base):
 # Takes in the API request. Returns the data in dictionary format
@@ -111,28 +106,29 @@ def getReq(base):
 
 
 def fillTable(cur, conn):
-# Takes in cur and connection. Fills up the Deezer table 
+# Takes in cur and connection. Makes and fills up the Deezer table 
 # with the fetched information. Prints a "done" statement when collection is finished. 
-    
-
-    #call the getInfo function
     data = getInfo(cur, conn)
-
-    #initialize track_id and increment value for each song
-    track_id = 0
-
-    #loop thru data and assign each value to a column in the table
-    for song in data:
-        track_id += 1
-        song_name = song[0]
-        artist_name = song[1]
-        songs_deezer_rank = song[2]
-        artist_fan_number = song[3]
-        cur.execute('INSERT OR IGNORE INTO Deezer (track_id, song_name, artist_name, songs_deezer_rank, artist_fan_number) VALUES (?,?,?,?,?)', (track_id, song_name, artist_name, songs_deezer_rank, artist_fan_number))
-    conn.commit()
+    #create table
+    cur.execute(f'CREATE TABLE IF NOT EXISTS Deezer (track_id INTEGER PRIMARY KEY, song_name TEXT, artist_name TEXT, songs_deezer_rank INTEGER, artist_fan_number INTEGER)')
+    cur.execute(f'SELECT * FROM Deezer')
+    track_id = cur.fetchall()
+    current = len(track_id)
+    try:
+        for song in range(0,25):
+        #loop thru data and assign each value to a column in the table
+            song_name = data[current + song][0]
+            artist_name = data[current + song][1]
+            songs_deezer_rank = data[current + song][2]
+            artist_fan_number = data[current + song][3]
+            cur.execute('INSERT OR IGNORE INTO Deezer (track_id, song_name, artist_name, songs_deezer_rank, artist_fan_number) VALUES (?,?,?,?,?)', (current + song + 1, song_name, artist_name, songs_deezer_rank, artist_fan_number))
+            conn.commit()
 
     #code takes a very long time to run, so this prints "done filling table" when the code is done
-    print('done filling table')
+        print('done filling 25 rows')
+    except:
+        print('ERROR: Ran too many times!')
+  
 
 def avgFans(cur,conn):
 # Takes in cursor and connection. Calculates the average Deezer fan number for
@@ -211,7 +207,6 @@ def writeToFile(filename, cur, conn):
 def main():
     cur, conn = setUpDatabase('top_100_songs.db')
     getInfo(cur, conn)
-    makeDeezerTable(cur)
     getReq(base)
     fillTable(cur, conn)
     avgFans(cur,conn)
