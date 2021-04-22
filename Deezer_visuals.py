@@ -18,7 +18,7 @@ def main():
     cur = conn.cursor()
 
 
-    cur.execute('SELECT song_id, songs_deezer_rank FROM Deezer')
+    cur.execute('SELECT track_id, songs_deezer_rank FROM Deezer')
     results = cur.fetchall()
 
     #creates empty lists to store the information
