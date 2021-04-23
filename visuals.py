@@ -12,14 +12,14 @@ import json
 
 
 def main():
-    #Takes in nothing; Returns nothing; Selects data from the database tables creates 3(?) visualizations
+    #Takes in nothing; Returns nothing; Selects data from the database tables creates 4 visualizations
     
     #sets up cur and conn
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/top_100_songs.db')
     cur = conn.cursor()
 
-
+    #pull data from deezer table
     cur.execute('SELECT track_id, song_name, songs_deezer_rank, artist_fan_number, artist_name FROM Deezer')
     results = cur.fetchall()
 
@@ -51,12 +51,14 @@ def main():
     figure1.show()
     
 
-    #figure 2: bar 
+    #figure 2: bar chart of the fan numbers for the artists of the top 30 songs
     figure2 = px.bar(
         x = artist_names[0:30],
         y = fan_number_list[0:30]
         )
-    figure2.update_layout(title = 'Fan numbers for the artists of Billboard top 30 songs', xaxis_title = 'artist name', yaxis_title = 'artist fan number')
+    figure2.update_layout(title = 'Fan numbers for the artists of Billboard top 30 songs', 
+    xaxis_title = 'artist name', 
+    yaxis_title = 'artist fan number')
     figure2.show()    
 
 
@@ -74,20 +76,20 @@ def main():
         popularity_list.append(r[1])
         weeks_on_chart_list.append(r[0])
     
-    #creates a scatter plot of each songs Spotify popularity vs weeks on Hot 100 chart to see if correlation
-    fig1 = go.Figure()
-    fig1.add_trace(go.Scatter(
+    #Figure 3: creates a scatter plot of each songs Spotify popularity vs weeks on Hot 100 chart to see if correlation
+    figure3 = go.Figure()
+    figure3.add_trace(go.Scatter(
         x = popularity_list,
         y = weeks_on_chart_list,
         marker = dict(color = 'green', size = 10),
         mode = 'markers',
         name = 'Spotify Popularity vs # Weeks on Billboard Hot 100 Chart',
     ))
-    fig1.update_layout(title = "Spotify Popularity of Top 100 Songs vs. # Weeks on Billboard 100 Chart",
+    figure3.update_layout(title = "Spotify Popularity of Top 100 Songs vs. # Weeks on Billboard 100 Chart",
                         xaxis_title="Spotify Popularity", yaxis_title="# Weeks on Chart", xaxis=dict(range=[0, 100]))
-    fig1.show()
+    figure3.show()
 
-
+    #Figure 4
     cur.execute('SELECT Hot_100_Songs.rank, Spotify.energy FROM Hot_100_Songs JOIN Spotify ON Hot_100_Songs.rank = Spotify.track_id')
     data = cur.fetchall()
 
@@ -98,17 +100,17 @@ def main():
         rank_list.append(element[0])
         energy_list.append(element[1])
 
-    fig3 = go.Figure()
-    fig3.add_trace(go.Scatter(
+    figure4 = go.Figure()
+    figure4.add_trace(go.Scatter(
         x = rank_list,
         y = energy_list,
         marker = dict(color = 'blue', size = 10),
         mode = 'markers',
         name = 'Billboard Hot 100 Rank vs Spotify Song Energy',
     ))
-    fig3.update_layout(title = "Billboard Hot 100 Rank vs Spotify Song Energy",
+    figure4.update_layout(title = "Billboard Hot 100 Rank vs Spotify Song Energy",
                         xaxis_title="Hot 100 Rank", yaxis_title="Spotify Song Energy", xaxis=dict(range=[0, 100]))
-    fig3.show()
+    figure4.show()
 
 if __name__ == "__main__":
     main()
