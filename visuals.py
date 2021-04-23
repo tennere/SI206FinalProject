@@ -88,6 +88,27 @@ def main():
     fig1.show()
 
 
+    cur.execute('SELECT Hot_100_Songs.rank, Spotify.energy FROM Hot_100_Songs JOIN Spotify ON Hot_100_Songs.rank = Spotify.track_id')
+    data = cur.fetchall()
+
+    rank_list = []
+    energy_list = []
+
+    for element in data:
+        rank_list.append(element[0])
+        energy_list.append(element[1])
+
+    fig3 = go.Figure()
+    fig3.add_trace(go.Scatter(
+        x = rank_list,
+        y = energy_list,
+        marker = dict(color = 'blue', size = 10),
+        mode = 'markers',
+        name = 'Billboard Hot 100 Rank vs Spotify Song Energy',
+    ))
+    fig3.update_layout(title = "Billboard Hot 100 Rank vs Spotify Song Energy",
+                        xaxis_title="Hot 100 Rank", yaxis_title="Spotify Song Energy", xaxis=dict(range=[0, 100]))
+    fig3.show()
 
 if __name__ == "__main__":
     main()
