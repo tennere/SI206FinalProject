@@ -19,7 +19,7 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
  
  
 def setUpDatabase(db_name):
-   #Takes in the database name; Returns cursor and connector
+# Takes in the database name. Returns cursor and connector.
 
    path = os.path.dirname(os.path.abspath(__file__))
    conn = sqlite3.connect('top_100_songs.db')
@@ -28,7 +28,8 @@ def setUpDatabase(db_name):
  
  
 def getTitleList(cur, conn):
-   #Takes in cursor and connector; Returns list of titles of songs from Hot_100_Songs table
+# Gets titles from songs in the Billboard Hot 100 chart. Takes in cursor and 
+# connector. Returns list of titles of Billboard songs. 
    
    #Creates empty list to hold song titles 
    title_tup = []
@@ -48,7 +49,8 @@ def getTitleList(cur, conn):
  
  
 def getTitleIDs(titles_list):
-   #Takes in a list of song titles; Returns a list of Spotify IDs of each song
+# Gets Spotify title ids. Takes in a list of song titles. 
+# Returns a list of Spotify IDs of each song. 
    
    #create empty list that will hold all of the IDs
    title_ids = []
@@ -70,7 +72,8 @@ def getTitleIDs(titles_list):
  
  
 def getTrackFeatures(title_ids):
-   #Takes in a list of song's IDs; Returns a list of lists of features for each song
+# Gets song name, album, artist, length, danceability, energy, liveness, loudness, and tempo from API.
+# Takes in a list of song's IDs. Returns a list of lists of features for each song.
  
    #creates empty list that will store the features of every song
    tracks_features_list = []
@@ -105,9 +108,9 @@ def getTrackFeatures(title_ids):
  
  
 def create_spotify_table(cur, conn, tracks_features_list):
-   #Takes in cursor, connection, and list of lists of songs' features; Creates a Spotify table; Returns nothing
-   #The table includes the track_id, the song's name, the artist, the length (MS), the Spotify popularity, the energy, and the loudness
-   #Puts 25 songs and their features in the database at a time. After 100 songs, function returns an error statement
+#Takes in cursor, connection, and list of lists of songs' features. Creates a Spotify table. Returns nothing.
+#The table includes the track_id, the song's name, the artist, the length (MS), the Spotify popularity, the energy, and the loudness
+#Puts 25 songs and their features in the database at a time. After 100 songs, function returns an error statement. 
    
    cur.execute("CREATE TABLE IF NOT EXISTS Spotify (track_id INTEGER PRIMARY KEY, name TEXT, artist TEXT, length INTEGER, popularity INTEGER, energy REAL, loudness REAL)")
    data = tracks_features_list
@@ -136,7 +139,8 @@ def create_spotify_table(cur, conn, tracks_features_list):
 
  
 def average_popularity(cur,conn):
-   #Takes in cursor and connection; Returns a message that has the average Spotify popularity of the songs from the Hot_100_Songs Chart
+#Takes in cursor and connection. Returns a message that has the 
+# average Spotify popularity of the songs from the Hot_100_Songs Chart
    
    #selects the popularity value from the Spotify table
    cur.execute("SELECT popularity FROM Spotify")
@@ -164,7 +168,8 @@ def average_popularity(cur,conn):
  
  
 def average_length(cur,conn):
-   #Takes in cursor and connection; Returns a message that has the average length of the songs from the Hot_100_Songs Chart in ms
+# Takes in cursor and connection; Returns a message that has the average 
+# length of the songs from the Hot_100_Songs Chart in ms. 
 
    #creates list to store all of the lengths
    lengths = []
@@ -192,7 +197,8 @@ def average_length(cur,conn):
  
  
 def average_energy(cur, conn):
-   #Takes in cursor and connection; Returns a message that has the average energy of the songs from the Hot_100_Songs Chart
+#Takes in cursor and connection; Returns a message that has the average 
+# energy of the songs from the Hot_100_Songs Chart. 
    
    #creates a list to hold the energy values
    energies = []
@@ -220,7 +226,8 @@ def average_energy(cur, conn):
  
  
 def max_popularity(cur, conn):
-   #Takes in cursor and connection; Returns a message that has the maximum popularity out of all the songs from the Hot_100_Songs Chart
+#Takes in cursor and connection. Returns a message that has the maximum popularity 
+# out of all the songs from the Hot_100_Songs Chart
    
    #selects the popularity for each song
    cur.execute("SELECT popularity FROM Spotify")
@@ -243,7 +250,9 @@ def max_popularity(cur, conn):
  
  
 def write_data_to_file(filename, cur, conn):
-   #Takes in a filename, cursor, and connection; Returns nothing; Creates a file and writes the return values of the functions average_popularity(), average_length(), average_energy(), and max_popularity() to the file.
+#Takes in a filename, cursor, and connection. Returns nothing. Creates a file and writes the 
+# eturn values of the functions average_popularity(), average_length(), 
+# average_energy(), and max_popularity() to the file.
 
    #Call each function and assign the return values to variables
    avg_pop = average_popularity(cur, conn)
