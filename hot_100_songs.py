@@ -197,7 +197,10 @@ def create_txt_file(filename, cur, conn):
 
 
 def main():
-    
+# takes in nothing. returns nothing. creates cur and conn with set_up_database().
+# runs creating_top_100_songs_table(), data_collection_finished(), and 
+# runs create_txt_file() if data collection is finished. 
+   
     # creates the database
     cur, conn = set_up_database("top_100_songs.db")
     
