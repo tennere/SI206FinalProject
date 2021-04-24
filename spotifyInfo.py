@@ -272,7 +272,9 @@ def write_data_to_file(filename, cur, conn):
  
  
 def main():
-   #Takes in nothing; Returns nothing; Calls the functions
+# takes in nothing. returns nothing. creates cur and conn through setUpDatabase().
+# runs the getTitleList(), getTrackFeatures(), create_spotify_table()
+# and write_data_to_file() functions. 
 
    #creates the database cursor and connection
    cur, conn = setUpDatabase('top_100_songs.db')
