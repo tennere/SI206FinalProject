@@ -135,7 +135,9 @@ def visual4(cur):
     fig4.show()
 
 def main():
-    
+# takes in nothing. returns nothing. sets up path, cur, and conn.
+# runs all four visualization functions. 
+
     #sets up cur and conn
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/top_100_songs.db')
