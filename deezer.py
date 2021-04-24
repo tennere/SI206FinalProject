@@ -205,6 +205,10 @@ def writeToFile(filename, cur, conn):
     f.close()
     
 def main():
+# takes in nothing. returns nothing. creates cur and conn through the setUpDatabase()
+# function. runs the getInfo(), getReq(), fillTable(), avgFans(), avgRank()
+# and writeToFile() functions.
+
     cur, conn = setUpDatabase('top_100_songs.db')
     getInfo(cur, conn)
     getReq(base)
